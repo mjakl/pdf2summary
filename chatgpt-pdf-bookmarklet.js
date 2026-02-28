@@ -104,10 +104,10 @@ Produce the final narrative text.`;
       throw new Error("Clipboard API not available");
     }
     await navigator.clipboard.writeText(finalPrompt);
-    alert("Prompt copied to clipboard. Paste into ChatGPT Pro.");
+    alert("Prompt copied to clipboard. Paste into Gemini.");
   } catch (e) {
     prompt("Copy this prompt:", finalPrompt);
   }
 
-  window.open("https://chatgpt.com/", "_blank", "noopener");
+  window.open("https://gemini.google.com/", "_blank", "noopener");
 })();
