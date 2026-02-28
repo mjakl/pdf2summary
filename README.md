@@ -36,8 +36,8 @@ Use any LLM you like. In my own tests, Gemini 3.x produced the smoothest narrati
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/)
-- [just](https://github.com/casey/just) (optional, but recommended)
+- [Node.js](https://nodejs.org/) **or** [Bun](https://bun.sh/)
+- [just](https://github.com/casey/just) (optional; current shortcut recipes use Bun)
 
 ### 1) Customize the prompt
 
@@ -49,7 +49,7 @@ Important: keep `{{PDF_URL}}` in the template. That placeholder is replaced auto
 
 ### 2) Generate the bookmarklet
 
-Using `just`:
+Using `just` (with Bun installed):
 
 ```bash
 just generate
@@ -69,6 +69,16 @@ Generate + copy in one command:
 
 ```bash
 just build-and-copy
+```
+
+If you prefer to run the generator directly (without `just`), it works with both Node and Bun:
+
+```bash
+# Node
+node ./make-pdf2summary-bookmarklet.js
+
+# Bun
+bun run ./make-pdf2summary-bookmarklet.js
 ```
 
 ## Prompt customization guide
@@ -95,21 +105,23 @@ You can opt in when generating:
 just generate open_url="https://gemini.google.com/u/1/app"
 ```
 
-Or via direct script usage:
+Or via direct script usage (Node example; same flags work with Bun):
 
 ```bash
-bun run ./make-pdf2summary-bookmarklet.js --open-url "https://gemini.google.com/u/1/app"
+node ./make-pdf2summary-bookmarklet.js --open-url "https://gemini.google.com/u/1/app"
 ```
 
 Disable opening explicitly:
 
 ```bash
-bun run ./make-pdf2summary-bookmarklet.js --no-open
+node ./make-pdf2summary-bookmarklet.js --no-open
 ```
 
 ### Environment variable fallback
 
 If `PDF2SUMMARY_OPEN_URL` is set, the generator uses it automatically (unless `--no-open` is provided).
+
+This is the most convenient way to keep your preferred provider URL out of commands. In practice, this pairs nicely with [direnv](https://direnv.net/) or [mise](https://mise.jdx.dev/) so the value is loaded automatically per project.
 
 Example `.envrc`:
 
@@ -117,11 +129,13 @@ Example `.envrc`:
 export PDF2SUMMARY_OPEN_URL="https://gemini.google.com/u/1/app"
 ```
 
-Then allow it (if you use direnv):
+If you use direnv, allow it once in the repo:
 
 ```bash
 direnv allow
 ```
+
+If you use mise, load the same variable via your preferred mise environment setup.
 
 ## How to install a bookmarklet
 
