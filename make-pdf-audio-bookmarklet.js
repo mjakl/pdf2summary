@@ -5,6 +5,7 @@ const path = require("path");
 
 const DEFAULT_PROMPT_FILE = "pdf-audio-prompt-template.txt";
 const DEFAULT_OUTPUT_FILE = "pdf-audio-bookmarklet.generated.txt";
+const OPEN_URL_ENV_VAR = "PDF2SUMMARY_OPEN_URL";
 
 function fail(message) {
   console.error(`Error: ${message}`);
@@ -14,6 +15,7 @@ function fail(message) {
 function parseArgs(argv) {
   const positional = [];
   let openUrlArg;
+  let explicitNoOpen = false;
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -24,17 +26,20 @@ function parseArgs(argv) {
         fail("Missing value for --open-url.");
       }
       openUrlArg = value.trim();
+      explicitNoOpen = false;
       i += 1;
       continue;
     }
 
     if (arg.startsWith("--open-url=")) {
       openUrlArg = arg.slice("--open-url=".length).trim();
+      explicitNoOpen = false;
       continue;
     }
 
     if (arg === "--no-open") {
-      openUrlArg = "";
+      explicitNoOpen = true;
+      openUrlArg = undefined;
       continue;
     }
 
@@ -55,10 +60,46 @@ function parseArgs(argv) {
     promptPathArg: positional[0] || DEFAULT_PROMPT_FILE,
     outputPathArg: positional[1] || DEFAULT_OUTPUT_FILE,
     openUrlArg,
+    explicitNoOpen,
   };
 }
 
-const { promptPathArg, outputPathArg, openUrlArg } = parseArgs(
+function resolveOpenUrl(openUrlArg, explicitNoOpen) {
+  if (explicitNoOpen) {
+    return { providerOpenUrl: null, source: null };
+  }
+
+  const envOpenUrl = (process.env[OPEN_URL_ENV_VAR] || "").trim();
+  const candidate = openUrlArg !== undefined ? openUrlArg : envOpenUrl;
+
+  if (!candidate) {
+    return { providerOpenUrl: null, source: null };
+  }
+
+  let parsedOpenUrl;
+  try {
+    parsedOpenUrl = new URL(candidate);
+  } catch {
+    if (openUrlArg !== undefined) {
+      fail(`Invalid --open-url value: ${candidate}`);
+    }
+    fail(`Invalid ${OPEN_URL_ENV_VAR} value: ${candidate}`);
+  }
+
+  if (!/^https?:$/.test(parsedOpenUrl.protocol)) {
+    if (openUrlArg !== undefined) {
+      fail(`--open-url must use http or https: ${candidate}`);
+    }
+    fail(`${OPEN_URL_ENV_VAR} must use http or https: ${candidate}`);
+  }
+
+  return {
+    providerOpenUrl: parsedOpenUrl.toString(),
+    source: openUrlArg !== undefined ? "--open-url" : OPEN_URL_ENV_VAR,
+  };
+}
+
+const { promptPathArg, outputPathArg, openUrlArg, explicitNoOpen } = parseArgs(
   process.argv.slice(2)
 );
 
@@ -81,21 +122,10 @@ if (!template.includes("{{PDF_URL}}")) {
   );
 }
 
-let providerOpenUrl = null;
-if (openUrlArg !== undefined && openUrlArg.length > 0) {
-  let parsedOpenUrl;
-  try {
-    parsedOpenUrl = new URL(openUrlArg);
-  } catch {
-    fail(`Invalid --open-url value: ${openUrlArg}`);
-  }
-
-  if (!/^https?:$/.test(parsedOpenUrl.protocol)) {
-    fail(`--open-url must use http or https: ${openUrlArg}`);
-  }
-
-  providerOpenUrl = parsedOpenUrl.toString();
-}
+const { providerOpenUrl, source: openUrlSource } = resolveOpenUrl(
+  openUrlArg,
+  explicitNoOpen
+);
 
 const copiedAlertText = providerOpenUrl
   ? "Prompt copied to clipboard. Opening the provider page."
@@ -117,5 +147,9 @@ fs.writeFileSync(outputPath, `${bookmarklet}\n`, "utf8");
 
 console.log(`Prompt template: ${promptPath}`);
 console.log(`Bookmarklet output: ${outputPath}`);
-console.log(`Open provider page: ${providerOpenUrl || "(disabled)"}`);
+if (providerOpenUrl) {
+  console.log(`Open provider page: ${providerOpenUrl} (source: ${openUrlSource})`);
+} else {
+  console.log("Open provider page: (disabled)");
+}
 console.log("Done. Copy the full line from the output file into your Chrome bookmark URL field.");
