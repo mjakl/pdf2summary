@@ -161,10 +161,10 @@ Tip: keep bookmarks bar visible while testing.
 
 Once the summary is generated, you can listen to it with:
 
-- Readwise Reader (text-to-speech)
+- [Readwise Reader (text-to-speech)](https://read.readwise.io/)
 - built-in text-to-speech in your LLM provider
 
-If you prefer a more automated workflow and do not want this semi-manual setup, check out **Paper2Audio**.
+If you prefer a more automated workflow and do not want this semi-manual setup, check out [Paper2Audio](https://www.paper2audio.com/).
 
 ## Papers to test with
 
@@ -187,4 +187,4 @@ If you prefer a more automated workflow and do not want this semi-manual setup, 
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+MIT.
