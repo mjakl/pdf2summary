@@ -8,8 +8,8 @@ function fail(message) {
   process.exit(1);
 }
 
-const promptPathArg = process.argv[2] || "chatgpt-pdf-prompt-template.txt";
-const outputPathArg = process.argv[3] || "chatgpt-pdf-bookmarklet.generated.txt";
+const promptPathArg = process.argv[2] || "pdf-audio-prompt-template.txt";
+const outputPathArg = process.argv[3] || "pdf-audio-bookmarklet.generated.txt";
 
 const promptPath = path.resolve(process.cwd(), promptPathArg);
 const outputPath = path.resolve(process.cwd(), outputPathArg);
