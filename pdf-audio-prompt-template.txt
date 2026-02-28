@@ -64,6 +64,10 @@ TARGET LENGTH:
 
 Aim for 12 to 18 minutes when read aloud (roughly 1,900 to 2,700 words), prioritizing depth on the core contribution over exhaustive related work.
 
+CHAT NAMING:
+
+Before producing the summary, set the chat title to this format: "🔊 <Name of paper>". If the paper title is unclear, generate a concise descriptive title and use the same format.
+
 DELIVERABLE:
 
 Produce the final narrative text.
