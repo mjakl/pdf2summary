@@ -3,8 +3,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const DEFAULT_PROMPT_FILE = "pdf-audio-prompt-template.txt";
-const DEFAULT_OUTPUT_FILE = "pdf-audio-bookmarklet.generated.txt";
+const DEFAULT_PROMPT_FILE = "pdf2summary-prompt-template.txt";
+const DEFAULT_OUTPUT_FILE = "pdf2summary-bookmarklet.generated.txt";
 const OPEN_URL_ENV_VAR = "PDF2SUMMARY_OPEN_URL";
 
 function fail(message) {
@@ -52,7 +52,7 @@ function parseArgs(argv) {
 
   if (positional.length > 2) {
     fail(
-      "Usage: bun run ./make-pdf-audio-bookmarklet.js [prompt_file] [output_file] [--open-url <url>|--open-url=<url>|--no-open]"
+      "Usage: bun run ./make-pdf2summary-bookmarklet.js [prompt_file] [output_file] [--open-url <url>|--open-url=<url>|--no-open]"
     );
   }
 
