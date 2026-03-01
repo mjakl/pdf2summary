@@ -1,17 +1,16 @@
 (async () => {
-  const TEMPLATE = `ROLE: You are a technical educator translating academic machine learning and deep learning research into practitioner-accessible audio content.
+  const TEMPLATE = `ROLE: You are a technical educator translating academic and technical sources into practitioner-accessible audio content.
 
-SOURCE PDF: {{PDF_URL}}
+SOURCE DOCUMENT: {{SOURCE_URL}}
 
 AUDIENCE: An engineer with basic calculus and linear algebra who wants practical understanding. Build conceptual bridges between intuition, system behavior, and mathematical formalism in plain language.
 
 TASK:
-
-Read the source PDF and produce an audio-ready narrative summary.
+Read the source document and produce an audio-ready narrative summary.
 
 HARD CONSTRAINTS:
 
-If you cannot access the PDF, stop immediately and ask for an accessible link or uploaded file.
+If you cannot access the source document, stop immediately and ask for an accessible link or uploaded file.
 
 Do not fabricate claims, results, citations, or web sentiment.
 
@@ -27,7 +26,7 @@ Use natural spoken transitions.
 
 Use short spoken paragraphs (2 to 4 sentences) with explicit transitions between ideas.
 
-Within the first 100 words, state the paper's core claim in one sentence and why it matters in practice.
+Within the first 100 words, state the source's core claim in one sentence and why it matters in practice.
 
 Open with a grounded engineering scenario or design decision that the listener can visualize, but keep the tone analytical rather than dramatic.
 
@@ -59,7 +58,7 @@ Close with a concise recap of practical takeaways and where the method may fail 
 
 COVER THESE THEMES IN FLOWING PROSE (WITHOUT EXPLICIT HEADERS):
 
-Why the paper matters now for production engineers; conceptual foundations explained with intuitive metaphors and real-world engineering examples; methodology framed as practical design decisions including memory and compute tradeoffs; results interpreted as trends and practical implications; concrete engineering takeaways for future architecture or training choices; broader context about influence and impact if verifiable web evidence is available.
+Why the source matters now for production engineers; where the source falls in the broader field context and evolution; conceptual foundations explained with intuitive metaphors and real-world engineering examples; methodology framed as practical design decisions including memory and compute tradeoffs; results interpreted as trends and practical implications; concrete engineering takeaways for future architecture or training choices; broader context about influence and impact if verifiable web evidence is available.
 
 TARGET LENGTH:
 
@@ -67,7 +66,7 @@ Aim for 12 to 18 minutes when read aloud (roughly 1,900 to 2,700 words), priorit
 
 CHAT NAMING:
 
-Before producing the summary, set the chat title to this format: "🔊 <Name of paper>". If the paper title is unclear, generate a concise descriptive title and use the same format.
+Before producing the summary, set the chat title to this format: "🔊 <Source title>". If the title is unclear, generate a concise descriptive title and use the same format.
 
 DELIVERABLE:
 
@@ -82,26 +81,26 @@ Produce the final narrative text.`;
     }
   })();
 
-  const currentLooksLikePdf =
-    /\.pdf($|[?#])/i.test(currentUrl) ||
-    (!!parsedCurrentUrl &&
-      /(^|\.)arxiv\.org$/i.test(parsedCurrentUrl.hostname) &&
-      /^\/pdf\//i.test(parsedCurrentUrl.pathname));
+  const currentIsHttpUrl =
+    !!parsedCurrentUrl && /^https?:$/.test(parsedCurrentUrl.protocol);
 
-  const attachedPdfFallback =
-    "Attached PDF uploaded in this chat (no URL provided). Use the uploaded file as the source.";
+  const attachedSourceFallback =
+    "Attached source document uploaded in this chat (no URL provided). Use the uploaded file as the source.";
 
-  let pdfUrl = currentUrl;
-  if (!currentLooksLikePdf) {
+  let sourceUrl = currentUrl;
+  if (!currentIsHttpUrl) {
     const enteredUrl = prompt(
-      "PDF URL (optional; leave blank to use attached PDF):",
+      "Source URL (optional; leave blank to use an uploaded source):",
       ""
     );
     if (enteredUrl === null) return;
-    pdfUrl = enteredUrl.trim() || attachedPdfFallback;
+    sourceUrl = enteredUrl.trim() || attachedSourceFallback;
   }
 
-  const finalPrompt = TEMPLATE.replaceAll("{{PDF_URL}}", pdfUrl);
+  const finalPrompt = TEMPLATE.replaceAll("{{SOURCE_URL}}", sourceUrl).replaceAll(
+    "{{PDF_URL}}",
+    sourceUrl
+  );
 
   try {
     if (!navigator.clipboard || !navigator.clipboard.writeText) {

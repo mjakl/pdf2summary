@@ -1,12 +1,12 @@
 # pdf2summary
 
-Create a one-click bookmarklet that prepares your paper-summary prompt, copies it to your clipboard, and (optionally) opens your LLM chat page.
+Create a one-click bookmarklet that prepares your summary prompt, copies it to your clipboard, and (optionally) opens your LLM chat page.
 
-This project is intentionally small and practical: it helps you apply **your own lens** to research papers instead of relying on someone else’s summary style.
+This project is intentionally small and practical: it helps you apply **your own lens** to technical sources instead of relying on someone else’s summary style.
 
 ## Why this exists
 
-Reading papers directly is one of the best ways to stay current.
+Reading primary sources directly is one of the best ways to stay current.
 
 There are great newsletters and websites that summarize research, but every summary is shaped by the author’s assumptions, priorities, and audience. With modern LLMs, you can keep the source material and apply your own lens: your background, your goals, your level of math comfort, and your preferred output style.
 
@@ -16,8 +16,8 @@ That is exactly what this repo is for.
 
 ### It does
 
-- keep a reusable prompt template for paper summaries
-- inject the current PDF URL into that template
+- keep a reusable prompt template for technical summaries
+- inject the current source URL into that template (PDF, HTML article, docs page, etc.)
 - generate a bookmarklet JavaScript URL you can save in your browser
 - copy the final prompt to clipboard when you click the bookmarklet
 - optionally open your LLM provider page after copying
@@ -45,7 +45,9 @@ Edit:
 
 - `pdf2summary-prompt-template.txt`
 
-Important: keep `{{PDF_URL}}` in the template. That placeholder is replaced automatically by the bookmarklet.
+Important: keep `{{SOURCE_URL}}` in the template. That placeholder is replaced automatically by the bookmarklet.
+
+> Backward compatibility: `{{PDF_URL}}` is still supported, but `{{SOURCE_URL}}` is the recommended placeholder going forward.
 
 ### 2) Generate the bookmarklet
 
@@ -93,7 +95,7 @@ Good knobs to tune:
 - **Focus**: architecture, optimization, data, evaluation, deployment trade-offs
 - **Output style**: narrative prose, concise memo, implementation checklist, etc.
 
-A useful workflow is to run 3–5 papers, then refine the template based on what felt too shallow, too dense, too verbose, or not actionable enough.
+A useful workflow is to run 3–5 sources, then refine the template based on what felt too shallow, too dense, too verbose, or not actionable enough.
 
 ## Provider page opening behavior
 
@@ -151,9 +153,9 @@ Tip: keep bookmarks bar visible while testing.
 
 ## How to use it
 
-1. Open a paper PDF page (ArXiv PDF pages work well).
+1. Open any source page you want summarized (PDF, HTML article, docs page, etc.).
 2. Click the `pdf2summary` bookmarklet.
-3. If you are not currently on a PDF URL, enter one when prompted.
+3. If the current tab is not a standard `http(s)` page, enter a source URL when prompted (or leave blank to reference an uploaded source file).
 4. The final prompt is copied to your clipboard.
 5. Paste into your LLM chat and run.
 
@@ -165,7 +167,7 @@ Once the summary is generated, you can listen to it with:
 - [Readwise Reader (text-to-speech)](https://read.readwise.io/)
 - built-in text-to-speech in your LLM provider
 
-## Papers to test with
+## Sources to test with
 
 - **Adam: A Method for Stochastic Optimization**  
   https://arxiv.org/pdf/1412.6980.pdf
@@ -173,8 +175,8 @@ Once the summary is generated, you can listen to it with:
 - **Dropout: A Simple Way to Prevent Neural Networks from Overfitting**  
   https://arxiv.org/pdf/1207.0580.pdf
 
-- **LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale**  
-  https://arxiv.org/pdf/2208.07339.pdf
+- **The Illustrated Transformer** (HTML article)  
+  https://jalammar.github.io/illustrated-transformer/
 
 ## Repository files
 

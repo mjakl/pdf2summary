@@ -116,9 +116,16 @@ if (!template) {
   fail(`Prompt template is empty: ${promptPath}`);
 }
 
-if (!template.includes("{{PDF_URL}}")) {
+const hasSourcePlaceholder = template.includes("{{SOURCE_URL}}");
+const hasLegacyPdfPlaceholder = template.includes("{{PDF_URL}}");
+
+if (!hasSourcePlaceholder && !hasLegacyPdfPlaceholder) {
   console.warn(
-    'Warning: template does not contain "{{PDF_URL}}". PDF URL injection will not happen.'
+    'Warning: template does not contain "{{SOURCE_URL}}" (or legacy "{{PDF_URL}}"). Source URL injection will not happen.'
+  );
+} else if (!hasSourcePlaceholder && hasLegacyPdfPlaceholder) {
+  console.warn(
+    'Warning: template uses legacy "{{PDF_URL}}" placeholder. Prefer "{{SOURCE_URL}}" for new templates.'
   );
 }
 
@@ -137,7 +144,7 @@ const openProviderSnippet = providerOpenUrl
 
 const bookmarkletBody = `(async()=>{const TEMPLATE=${JSON.stringify(
   template
-)};const currentUrl=location.href;const parsedCurrentUrl=(()=>{try{return new URL(currentUrl);}catch{return null;}})();const currentLooksLikePdf=/\\.pdf($|[?#])/i.test(currentUrl)||!!parsedCurrentUrl&&/(^|\\.)arxiv\\.org$/i.test(parsedCurrentUrl.hostname)&&/^\\/pdf\\//i.test(parsedCurrentUrl.pathname);const attachedPdfFallback="Attached PDF uploaded in this chat (no URL provided). Use the uploaded file as the source.";let pdf=currentUrl;if(!currentLooksLikePdf){const enteredUrl=prompt("PDF URL (optional; leave blank to use attached PDF):","");if(enteredUrl===null)return;pdf=enteredUrl.trim()||attachedPdfFallback;}const finalPrompt=TEMPLATE.split("{{PDF_URL}}").join(pdf);try{if(!navigator.clipboard||!navigator.clipboard.writeText)throw new Error("Clipboard API not available");await navigator.clipboard.writeText(finalPrompt);alert(${JSON.stringify(
+)};const currentUrl=location.href;const parsedCurrentUrl=(()=>{try{return new URL(currentUrl);}catch{return null;}})();const currentIsHttpUrl=!!parsedCurrentUrl&&/^https?:$/.test(parsedCurrentUrl.protocol);const attachedSourceFallback="Attached source document uploaded in this chat (no URL provided). Use the uploaded file as the source.";let source=currentUrl;if(!currentIsHttpUrl){const enteredUrl=prompt("Source URL (optional; leave blank to use an uploaded source):","");if(enteredUrl===null)return;source=enteredUrl.trim()||attachedSourceFallback;}const finalPrompt=TEMPLATE.split("{{SOURCE_URL}}").join(source).split("{{PDF_URL}}").join(source);try{if(!navigator.clipboard||!navigator.clipboard.writeText)throw new Error("Clipboard API not available");await navigator.clipboard.writeText(finalPrompt);alert(${JSON.stringify(
   copiedAlertText
 )});}catch(e){prompt("Copy this prompt:",finalPrompt);}${openProviderSnippet}})();`;
 
